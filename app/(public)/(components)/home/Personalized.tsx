@@ -52,13 +52,13 @@ const Personalized = () => {
       <div className="flex flex-col gap-6">
         <motion.h1
           variants={itemVariants}
-          className="text-10xl leading-none font-urbanist font-normal text-amber-500"
+          className="text-5xl lg:text-10xl leading-none font-urbanist font-normal text-amber-500"
         >
           Personalized Salah Companion!
         </motion.h1>
         <motion.p
           variants={itemVariants}
-          className="text-xl text-neutral-600 dark:text-neutral-300"
+          className="text-md md:text-xl text-neutral-600 dark:text-neutral-300"
         >
           Stay on track with your 5 daily prayers. With just a few taps, you can
           log your Salah, set reminders, and create custom goals like reading

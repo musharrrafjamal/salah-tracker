@@ -60,23 +60,23 @@ const Hero = () => {
       animate={controls}
     >
       <motion.div
-        className="-z-30 -bottom-24 dark:-bottom-64 dark:-left-24 -left-14 absolute blur-[80px] w-[36rem] h-[36rem] dark:w-[40rem] dark:h-[40rem] bg-gradient-to-tr from-[#FFD7CC] to-[#E7CCFF] dark:bg-gradient-to-tr dark:from-violet-900/50 dark:to-pink-900/50 rounded-full"
+        className="-z-30 -bottom-24 dark:-bottom-64 dark:-left-24 -left-14 absolute blur-[80px] w-[25rem] aspect-square dark:w-[40rem] bg-gradient-to-tr from-[#FFD7CC] to-[#E7CCFF] dark:bg-gradient-to-tr dark:from-violet-900/50 dark:to-pink-900/50 rounded-full"
         variants={itemVariants}
       />
-      <div className="relative w-full flex justify-center flex-col font-urbanist">
+      <div className="relative w-full flex justify-center flex-col  font-urbanist">
         <motion.div
           className="flex flex-col -space-y-2"
           variants={itemVariants}
         >
-          <div className="text-[9rem] leading-none font-bold text-primary-base">
+          <div className="text-7xl md:text-[9rem] leading-none font-bold text-primary-base">
             Track
           </div>
-          <div className="text-[9rem] leading-none font-bold text-blue-base">
+          <div className="text-7xl md:text-[9rem] leading-none font-bold text-blue-base">
             Reflect
           </div>
         </motion.div>
         <motion.div
-          className="text-3xl leading-10 font-normal text-neutral-600 dark:text-neutral-300"
+          className="text-3xl leading-10 font-normal text-neutral-600 dark:text-neutral-300 lg:text-start text-center"
           variants={itemVariants}
         >
           Get Closer To Your Deen!
@@ -96,7 +96,10 @@ const Hero = () => {
           </Button>
         </motion.div>
       </div>
-      <motion.div className="w-full flex justify-end" variants={itemVariants}>
+      <motion.div
+        className="w-full lg:flex justify-end hidden"
+        variants={itemVariants}
+      >
         <AnimatedHeroIllustration />
       </motion.div>
     </motion.div>

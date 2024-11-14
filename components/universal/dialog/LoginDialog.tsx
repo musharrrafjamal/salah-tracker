@@ -57,14 +57,15 @@ const LoginDialog = () => {
 
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
-            <div className="flex gap-2 items-center w-full">
+            <div className="flex gap-2 flex-col lg:flex-row items-center w-full">
               <Button
                 variant="secondary"
                 size="lg"
                 className="w-full transition-all transform hover:bg-red-500 hover:text-white"
               >
                 <FaGoogle className="w-5 h-5" />
-                <span>Google</span>
+                <span className="hidden lg:block">Google</span>
+                <span className="block lg:hidden">Continue with Google</span>
               </Button>
               <Button
                 variant="secondary"
@@ -72,7 +73,7 @@ const LoginDialog = () => {
                 className="w-full transition-all transform hover:bg-black dark:hover:bg-white dark:hover:text-black hover:text-white"
               >
                 <FaXTwitter className="w-5 h-5" />
-                <span>Twitter</span>
+                <span>Continue with X</span>
               </Button>
             </div>
             <Button
