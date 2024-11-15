@@ -28,7 +28,7 @@ export function StreakCard({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`relative overflow-hidden rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700/50 ${backgroundColor} ${className}`}
+      className={`relative overflow-hidden rounded-2xl border dark:border-gray-700/50 ${backgroundColor} ${className}`}
     >
       {/* Decorative Elements */}
       <div

@@ -61,7 +61,7 @@ export default function GaugeChart({
   ].filter((segment) => segment.value > 0);
 
   return (
-    <Card className={className}>
+    <div className={`${className} border rounded-2xl`}>
       <CardHeader>
         <CardTitle className="text-xl font-semibold text-center">
           {title}
@@ -149,6 +149,6 @@ export default function GaugeChart({
           </motion.p>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 }

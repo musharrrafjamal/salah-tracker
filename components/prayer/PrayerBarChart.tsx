@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { CardHeader, CardTitle } from "../shadcn/ui/card";
 
 interface ProgressBarProps {
   value: number;
@@ -31,15 +32,15 @@ const statusConfig = {
     color: "bg-emerald-500",
     trackColor: "bg-emerald-100 dark:bg-emerald-950/30",
   },
-  "not-prayed": {
-    label: "Not Prayed",
-    color: "bg-red-500",
-    trackColor: "bg-red-100 dark:bg-red-950/30",
-  },
   late: {
     label: "Late",
     color: "bg-gray-400",
     trackColor: "bg-gray-100 dark:bg-gray-800",
+  },
+  "not-prayed": {
+    label: "Not Prayed",
+    color: "bg-red-500",
+    trackColor: "bg-red-100 dark:bg-red-950/30",
   },
 };
 
@@ -110,27 +111,34 @@ export function PrayerBarChart({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className={cn(
-        "flex items-end justify-center gap-8 p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800",
+        "flex flex-col p-4 pt-0 pb-6 gap-4 bg-white dark:bg-gray-900 border rounded-2xl",
         className
       )}
     >
-      {items.map((item, index) => (
-        <motion.div
-          key={index}
-          initial={animate ? { opacity: 0, y: 20 } : false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-        >
-          <ProgressBar
-            value={item.value}
-            status={item.status}
-            showLabel={showLabels}
-            height={barHeight}
-            width={barWidth}
-            animate={animate}
-          />
-        </motion.div>
-      ))}
+      <CardHeader>
+        <CardTitle className="text-xl font-semibold text-center">
+          Daily prayer statistics
+        </CardTitle>
+      </CardHeader>
+      <div className="flex gap-4 justify-center">
+        {items.map((item, index) => (
+          <motion.div
+            key={index}
+            initial={animate ? { opacity: 0, y: 20 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <ProgressBar
+              value={item.value}
+              status={item.status}
+              showLabel={showLabels}
+              height={barHeight}
+              width={barWidth}
+              animate={animate}
+            />
+          </motion.div>
+        ))}
+      </div>
     </motion.div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { Plus, Sunrise, Sun, Sunset, Moon } from "lucide-react";
+import { Plus, Sunrise, Sun, Sunset, Moon, CloudSun } from "lucide-react";
 import { Button } from "@/components/shadcn/ui/button";
 import { PrayerLegend } from "./PrayerLegend";
 import { PrayerBar } from "./PrayerBar";
@@ -32,15 +32,15 @@ export function PrayerTracker({
     {
       id: "fajr",
       name: "FAJR",
-      icon: <Sunrise className="w-5 h-5 text-lime-500" />,
-      iconColor: "bg-lime-50",
+      icon: <Sunrise className="w-5 h-5 text-emerald-500" />,
+      iconColor: "bg-emerald-50",
       status: "prayed",
     },
     {
       id: "dhuhr",
       name: "DHUHR",
-      icon: <Sun className="w-5 h-5 text-amber-500" />,
-      iconColor: "bg-amber-50",
+      icon: <CloudSun className="w-5 h-5 text-sky-500" />,
+      iconColor: "bg-sky-50",
       status: "late",
     },
     {
@@ -60,8 +60,8 @@ export function PrayerTracker({
     {
       id: "isha",
       name: "ISHA",
-      icon: <Moon className="w-5 h-5 text-blue-500" />,
-      iconColor: "bg-blue-50",
+      icon: <Moon className="w-5 h-5 text-indigo-500" />,
+      iconColor: "bg-indigo-50",
       status: "prayed",
     },
   ]);
