@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/provider/ThemeProvider";
 import ReduxProvider from "@/provider/ReduxProvider";
 import LoginDialog from "@/components/universal/dialog/LoginDialog";
+import { Toaster } from "sonner";
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -40,6 +41,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <Toaster position="top-right" closeButton richColors />
             <LoginDialog />
             {children}
           </ThemeProvider>

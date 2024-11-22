@@ -3,8 +3,8 @@
 import React, { useEffect, useRef } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { ScanFace, Sparkles } from "lucide-react";
-import AnimatedHeroIllustration from "./AnimatedHeroIllustration";
 import { Button } from "@/components/shadcn/ui/button";
+import AnimatedHeroIllustration from "../assets/AnimatedHeroIllustration";
 
 const Hero = () => {
   const controls = useAnimation();

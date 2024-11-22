@@ -3,20 +3,13 @@
 import React, { useEffect, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { PrayerTracker } from "@/components/universal/ui/prayer-tracker/PrayerTracker";
 import { Calendar } from "@/components/shadcn/ui/calendar";
 import { PrayerDayStatus } from "@/components/prayer/PrayerDayStatus";
 import { StreakCard } from "@/components/prayer/StreakCard";
 import { PrayerBarChart } from "@/components/prayer/PrayerBarChart";
 import GaugeChart from "@/components/prayer/GaugeChart";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/shadcn/ui/card";
-import CurrentStreakSvg from "./CurrentStreakSvg";
-import LongestStreakSvg from "./LongestStreakSvg";
+import CurrentStreakSvg from "../assets/CurrentStreakSvg";
+import LongestStreakSvg from "../assets/LongestStreakSvg";
 
 const TrackAdvancement = () => {
   const controls = useAnimation();
@@ -99,10 +92,6 @@ const TrackAdvancement = () => {
       </div>
       <motion.div variants={itemVariants} className="mt-10">
         <div className="container mx-auto p-4 space-y-8">
-          <h1 className="text-3xl font-bold text-center mb-8">
-            Prayer Dashboard
-          </h1>
-
           <div className="flex items-stretch w-full gap-8">
             <div className="flex-shrink-0">
               <Calendar
