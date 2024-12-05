@@ -47,7 +47,7 @@ const Personalized = () => {
       initial="hidden"
       animate={controls}
       variants={containerVariants}
-      className="mt-14"
+      className="mt-10"
     >
       <div className="flex flex-col gap-6">
         <motion.h1

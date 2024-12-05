@@ -56,7 +56,7 @@ const TrackAdvancement = () => {
   ];
 
   const stats = {
-    prayed: 3,
+    prayed: 4,
     late: 1,
     notPrayed: 1,
   };
@@ -67,7 +67,7 @@ const TrackAdvancement = () => {
       initial="hidden"
       animate={controls}
       variants={containerVariants}
-      className="mt-14"
+      className="mt-10"
     >
       <div className="flex flex-col gap-6">
         <motion.h1
@@ -124,16 +124,10 @@ const TrackAdvancement = () => {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <PrayerDayStatus />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {/* <PrayerDayStatus /> */}
 
-            <PrayerBarChart
-              items={progressData}
-              showLabels={true}
-              barWidth={60}
-              barHeight={240}
-              className="w-full"
-            />
+            <PrayerBarChart />
 
             <GaugeChart
               stats={stats}

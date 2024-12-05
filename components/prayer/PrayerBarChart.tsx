@@ -1,144 +1,269 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { motion, AnimatePresence } from "framer-motion";
+import { Moon, Sparkles, Sun } from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/shadcn/ui/card";
+import { Button } from "@/components/shadcn/ui/button";
+import { Badge } from "@/components/shadcn/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/shadcn/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { CardHeader, CardTitle } from "../shadcn/ui/card";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/shadcn/ui/chart";
 
-interface ProgressBarProps {
-  value: number;
-  status: "prayed" | "not-prayed" | "late";
-  showLabel?: boolean;
-  height?: number;
-  width?: number;
-  className?: string;
-  animate?: boolean;
-}
-
-interface ProgressGroupProps {
-  items: {
-    value: number;
-    status: "prayed" | "not-prayed" | "late";
-  }[];
-  className?: string;
-  showLabels?: boolean;
-  barWidth?: number;
-  barHeight?: number;
-  animate?: boolean;
-}
+const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
 const statusConfig = {
   prayed: {
     label: "Prayed",
     color: "bg-emerald-500",
-    trackColor: "bg-emerald-100 dark:bg-emerald-950/30",
+    textColor: "text-white",
   },
   late: {
     label: "Late",
-    color: "bg-gray-400",
-    trackColor: "bg-gray-100 dark:bg-gray-800",
+    color: "bg-amber-500",
+    textColor: "text-white",
   },
   "not-prayed": {
     label: "Not Prayed",
-    color: "bg-red-500",
-    trackColor: "bg-red-100 dark:bg-red-950/30",
+    color: "bg-gradient-to-r from-red-400 to-red-600",
+    textColor: "text-white",
   },
 };
 
-function ProgressBar({
-  value,
+interface PrayerData {
+  name: string;
+  prayed: number;
+  late: number;
+  "not-prayed": number;
+}
+
+const AnimatedStatusButton = ({
   status,
-  showLabel = true,
-  height = 240,
-  width = 60,
-  className,
-  animate = true,
-}: ProgressBarProps) {
-  const config = statusConfig[status];
+  config,
+  isSelected,
+  onClick,
+}: {
+  status: string;
+  config: {
+    label: string;
+    color: string;
+    textColor: string;
+  };
+  isSelected: boolean;
+  onClick: () => void;
+}) => {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                `relative overflow-hidden transition-all duration-300 ${
+                  isSelected ? `hover:${config.color}` : "hover:bg-gray-200"
+                } ${isSelected ? "hover:text-white" : ""}`,
+                isSelected ? config.color : "bg-gray-200",
+                isSelected ? config.textColor : "text-gray-800",
+                "font-semibold py-2 px-4"
+              )}
+              onClick={onClick}
+            >
+              <motion.span
+                className="relative z-10"
+                transition={{ duration: 0.3 }}
+              >
+                {config.label}
+              </motion.span>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
+                initial={{ x: "-100%" }}
+                animate={isSelected ? { x: "100%" } : { x: "-100%" }}
+                transition={{
+                  duration: 1,
+                  repeat: isSelected ? Infinity : 0,
+                  repeatType: "loop",
+                }}
+              />
+            </Button>
+          </motion.div>
+        </TooltipTrigger>
+        <TooltipContent
+          side="bottom"
+          className="bg-gray-800 text-white p-2 rounded-md shadow-lg"
+        >
+          <p>Click to {isSelected ? "unfilter" : "filter"} chart</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+const generateRandomData = (): PrayerData[] => {
+  return prayers.map((prayer) => ({
+    name: prayer,
+    prayed: Math.floor(Math.random() * 100),
+    late: Math.floor(Math.random() * 50),
+    "not-prayed": Math.floor(Math.random() * 30),
+  }));
+};
+
+export function PrayerBarChart() {
+  const [data, setData] = useState<PrayerData[]>(generateRandomData());
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const handleStatusClick = (status: string) => {
+    setSelectedStatus(selectedStatus === status ? null : status);
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    // You would typically update your app's theme here
+    document.documentElement.classList.toggle("dark");
+  };
 
   return (
-    <div className={cn("flex flex-col items-center gap-3", className)}>
-      <div
-        className="relative rounded-full overflow-hidden"
-        style={{ height, width }}
-      >
-        {/* Track */}
-        <div className={cn("absolute inset-0", config.trackColor)} />
-
-        {/* Progress */}
-        <motion.div
-          initial={animate ? { height: 0 } : false}
-          animate={{ height: `${value}%` }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className={cn(
-            "absolute bottom-0 left-0 right-0 rounded-full",
-            config.color
-          )}
-        />
-
-        {/* Decorative Elements */}
-        <motion.div
-          initial={animate ? { opacity: 0 } : false}
-          animate={{ opacity: 0.2 }}
-          transition={{ duration: 1 }}
-          className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.2),transparent)] pointer-events-none" />
-      </div>
-      {showLabel && (
-        <motion.span
-          initial={animate ? { opacity: 0, y: 10 } : false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="text-sm font-medium text-gray-600 dark:text-gray-300"
+    <Card className={cn("w-full max-w-3xl", isDarkMode ? "dark" : "")}>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-2xl font-bold">
+            Prayer Statistics
+          </CardTitle>
+          <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
+            {isDarkMode ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
+        <CardDescription>Daily prayer performance overview</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer
+          config={{
+            prayed: {
+              label: "Prayed",
+              color: "hsl(var(--chart-1))",
+            },
+            late: {
+              label: "Late",
+              color: "hsl(var(--chart-2))",
+            },
+            "not-prayed": {
+              label: "Not Prayed",
+              color: "hsl(var(--chart-3))",
+            },
+          }}
+          className="h-[300px]"
         >
-          {config.label}
-        </motion.span>
-      )}
-    </div>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <ChartTooltip content={<CustomTooltip />} />
+              <Bar
+                dataKey="prayed"
+                stackId="a"
+                fill="var(--color-prayed)"
+                radius={[4, 4, 0, 0]}
+                opacity={
+                  selectedStatus === null || selectedStatus === "prayed"
+                    ? 1
+                    : 0.3
+                }
+              />
+              <Bar
+                dataKey="late"
+                stackId="a"
+                fill="var(--color-late)"
+                radius={[4, 4, 0, 0]}
+                opacity={
+                  selectedStatus === null || selectedStatus === "late" ? 1 : 0.3
+                }
+              />
+              <Bar
+                dataKey="not-prayed"
+                stackId="a"
+                fill="var(--color-not-prayed)"
+                radius={[4, 4, 0, 0]}
+                opacity={
+                  selectedStatus === null || selectedStatus === "not-prayed"
+                    ? 1
+                    : 0.3
+                }
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+        <div className="flex flex-wrap justify-center mt-6 gap-4">
+          {Object.entries(statusConfig).map(([key, config]) => (
+            <AnimatedStatusButton
+              key={key}
+              status={key}
+              config={config}
+              isSelected={selectedStatus === key}
+              onClick={() => handleStatusClick(key)}
+            />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
-export function PrayerBarChart({
-  items,
-  className,
-  showLabels = true,
-  barWidth = 60,
-  barHeight = 240,
-  animate = true,
-}: ProgressGroupProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className={cn(
-        "flex flex-col p-4 pt-0 pb-6 gap-4 bg-white dark:bg-gray-900 border rounded-2xl",
-        className
-      )}
-    >
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold text-center">
-          Daily prayer statistics
-        </CardTitle>
-      </CardHeader>
-      <div className="flex gap-4 justify-center">
-        {items.map((item, index) => (
-          <motion.div
-            key={index}
-            initial={animate ? { opacity: 0, y: 20 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+function CustomTooltip({ active, payload, label }: any) {
+  if (active && payload && payload.length) {
+    const totalPrayers = payload.reduce(
+      (sum: number, entry: any) => sum + entry.value,
+      0
+    );
+    return (
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="font-bold text-lg mb-2">{label}</h3>
+        {payload.map((entry: any, index: number) => (
+          <div
+            key={`item-${index}`}
+            className="flex justify-between items-center mb-1"
           >
-            <ProgressBar
-              value={item.value}
-              status={item.status}
-              showLabel={showLabels}
-              height={barHeight}
-              width={barWidth}
-              animate={animate}
-            />
-          </motion.div>
+            <span
+              className={cn(
+                "font-medium",
+                statusConfig[entry.dataKey as keyof typeof statusConfig]
+                  .textColor
+              )}
+            >
+              {statusConfig[entry.dataKey as keyof typeof statusConfig].label}:
+            </span>
+            <Badge variant="secondary">
+              {entry.value} ({((entry.value / totalPrayers) * 100).toFixed(1)}%)
+            </Badge>
+          </div>
         ))}
+        <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+          <span className="font-bold">Total Prayers: {totalPrayers}</span>
+        </div>
       </div>
-    </motion.div>
-  );
+    );
+  }
+  return null;
 }
