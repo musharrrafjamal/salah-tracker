@@ -7,7 +7,7 @@ import { Calendar } from "@/components/shadcn/ui/calendar";
 import { PrayerDayStatus } from "@/components/prayer/PrayerDayStatus";
 import { StreakCard } from "@/components/prayer/StreakCard";
 import { PrayerBarChart } from "@/components/prayer/PrayerBarChart";
-import GaugeChart from "@/components/prayer/GaugeChart";
+import GaugeChart from "@/components/prayer/gauge-chart/GaugeChart";
 import CurrentStreakSvg from "../assets/CurrentStreakSvg";
 import LongestStreakSvg from "../assets/LongestStreakSvg";
 
@@ -56,9 +56,9 @@ const TrackAdvancement = () => {
   ];
 
   const stats = {
-    prayed: 4,
+    prayed: 2,
     late: 1,
-    notPrayed: 1,
+    notPrayed: 2,
   };
 
   return (

@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sparkles, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import {
   Card,
@@ -32,12 +33,12 @@ const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 const statusConfig = {
   prayed: {
     label: "Prayed",
-    color: "bg-emerald-500",
+    color: "bg-gradient-to-r from-emerald-400 to-emerald-600",
     textColor: "text-white",
   },
   late: {
     label: "Late",
-    color: "bg-amber-500",
+    color: "bg-gradient-to-r from-amber-400 to-amber-600",
     textColor: "text-white",
   },
   "not-prayed": {
@@ -54,6 +55,15 @@ interface PrayerData {
   "not-prayed": number;
 }
 
+const generateRandomData = (): PrayerData[] => {
+  return prayers.map((prayer) => ({
+    name: prayer,
+    prayed: Math.floor(Math.random() * 100),
+    late: Math.floor(Math.random() * 50),
+    "not-prayed": Math.floor(Math.random() * 30),
+  }));
+};
+
 const AnimatedStatusButton = ({
   status,
   config,
@@ -61,11 +71,7 @@ const AnimatedStatusButton = ({
   onClick,
 }: {
   status: string;
-  config: {
-    label: string;
-    color: string;
-    textColor: string;
-  };
+  config: any;
   isSelected: boolean;
   onClick: () => void;
 }) => {
@@ -75,20 +81,35 @@ const AnimatedStatusButton = ({
         <TooltipTrigger asChild>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
-              variant="ghost"
-              size="sm"
+              variant="outline"
+              size="lg"
               className={cn(
-                `relative overflow-hidden transition-all duration-300 ${
-                  isSelected ? `hover:${config.color}` : "hover:bg-gray-200"
-                } ${isSelected ? "hover:text-white" : ""}`,
-                isSelected ? config.color : "bg-gray-200",
-                isSelected ? config.textColor : "text-gray-800",
+                "relative overflow-hidden transition-all duration-300",
+                config.color,
+                config.textColor,
+                "border-2 shadow-md",
+                isSelected
+                  ? "ring-2 ring-offset-2"
+                  : "hover:ring-2 hover:ring-offset-2",
                 "font-semibold py-2 px-4"
               )}
               onClick={onClick}
             >
               <motion.span
+                className="absolute inset-0 flex items-center justify-center"
+                initial={{ opacity: 0, scale: 0 }}
+                animate={
+                  isSelected
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 0, scale: 0 }
+                }
+                transition={{ duration: 0.3 }}
+              >
+                <Sparkles className="w-5 h-5 text-yellow-400" />
+              </motion.span>
+              <motion.span
                 className="relative z-10"
+                animate={isSelected ? { x: 10 } : { x: 0 }}
                 transition={{ duration: 0.3 }}
               >
                 {config.label}
@@ -117,16 +138,7 @@ const AnimatedStatusButton = ({
   );
 };
 
-const generateRandomData = (): PrayerData[] => {
-  return prayers.map((prayer) => ({
-    name: prayer,
-    prayed: Math.floor(Math.random() * 100),
-    late: Math.floor(Math.random() * 50),
-    "not-prayed": Math.floor(Math.random() * 30),
-  }));
-};
-
-export function PrayerBarChart() {
+export function PrayerStatisticsChart() {
   const [data, setData] = useState<PrayerData[]>(generateRandomData());
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -226,6 +238,14 @@ export function PrayerBarChart() {
             />
           ))}
         </div>
+        <div className="mt-4 text-center">
+          <Button
+            variant="outline"
+            onClick={() => setData(generateRandomData())}
+          >
+            Generate New Data
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
@@ -240,25 +260,25 @@ function CustomTooltip({ active, payload, label }: any) {
     return (
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
         <h3 className="font-bold text-lg mb-2">{label}</h3>
-        {payload.map(
-          (entry: any, index: number) => (
-            console.log(entry),
-            (
-              <div
-                key={`item-${index}`}
-                className="flex justify-between items-center gap-3 mb-1"
-              >
-                <span className={`text-gray-800 dark:text-white capitalize`}>
-                  {entry.name}
-                </span>
-                <Badge variant="secondary">
-                  {entry.value} (
-                  {((entry.value / totalPrayers) * 100).toFixed(1)}%)
-                </Badge>
-              </div>
-            )
-          )
-        )}
+        {payload.map((entry: any, index: number) => (
+          <div
+            key={`item-${index}`}
+            className="flex justify-between items-center mb-1"
+          >
+            <span
+              className={cn(
+                "font-medium",
+                statusConfig[entry.dataKey as keyof typeof statusConfig]
+                  .textColor
+              )}
+            >
+              {statusConfig[entry.dataKey as keyof typeof statusConfig].label}:
+            </span>
+            <Badge variant="secondary">
+              {entry.value} ({((entry.value / totalPrayers) * 100).toFixed(1)}%)
+            </Badge>
+          </div>
+        ))}
         <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
           <span className="font-bold">Total Prayers: {totalPrayers}</span>
         </div>

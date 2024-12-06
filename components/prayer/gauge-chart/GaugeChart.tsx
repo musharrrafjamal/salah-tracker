@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, AlertTriangle, CheckCircle } from "lucide-react";
+import { Sparkles, AlertTriangle, CheckCircle, Clock, X } from "lucide-react";
 
 import {
   Card,
@@ -19,6 +19,9 @@ import {
   TooltipTrigger,
 } from "@/components/shadcn/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { DateSelector } from "./DateSelector";
+import { Badge } from "@/components/shadcn/ui/badge";
+import { Progress } from "@/components/shadcn/ui/progress";
 
 interface PrayerStats {
   prayed: number;
@@ -38,6 +41,7 @@ interface GaugeChartProps {
 }
 
 const RADIAN = Math.PI / 180;
+
 const renderCustomizedLabel = ({
   cx,
   cy,
@@ -156,6 +160,7 @@ export default function GaugeChart({
   title = "Daily Prayer Statistics",
 }: GaugeChartProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const onPieEnter = (_: any, index: number) => {
     setActiveIndex(index);
@@ -163,7 +168,7 @@ export default function GaugeChart({
 
   // Calculate individual rates
   const calculateRates = (stats: PrayerStats) => {
-    const prayedRate = stats.prayed * 20;
+    const prayedRate = stats.prayed * 20 + stats.late * 10;
     const lateRate = stats.late * 10;
     const remainingRate = 100 - (prayedRate + lateRate);
 
@@ -175,7 +180,7 @@ export default function GaugeChart({
   };
 
   const { prayedRate, lateRate, notPrayedRate } = calculateRates(stats);
-  const completionRate = prayedRate + lateRate;
+  const completionRate = prayedRate;
 
   // Create segments for the gauge
   const data = [
@@ -192,23 +197,39 @@ export default function GaugeChart({
     return <AlertTriangle className="w-6 h-6 text-red-500" />;
   };
 
+  const prayerStatusConfig = {
+    prayed: {
+      icon: <CheckCircle className="w-5 h-5" />,
+      color: "text-green-500",
+      bgColor: "bg-green-100",
+      label: "Prayed",
+    },
+    late: {
+      icon: <Clock className="w-5 h-5" />,
+      color: "text-yellow-500",
+      bgColor: "bg-yellow-100",
+      label: "Late",
+    },
+    notPrayed: {
+      icon: <X className="w-5 h-5" />,
+      color: "text-red-500",
+      bgColor: "bg-red-100",
+      label: "Not Prayed",
+    },
+  };
+
   return (
     <Card className={cn("w-full", className)}>
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
           {title}
-          <motion.div
-            initial={{ rotate: 0 }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          >
-            <Sparkles className="w-6 h-6 text-yellow-400" />
-          </motion.div>
+          <Sparkles className="w-6 h-6 text-yellow-400" />
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-64 relative">
-          <ResponsiveContainer width="100%" height="100%">
+        <DateSelector date={selectedDate} onDateChange={setSelectedDate} />
+        <div className="h-52 relative">
+          <ResponsiveContainer width="100%" height="120%">
             <PieChart>
               <Pie
                 activeIndex={activeIndex}
@@ -219,7 +240,7 @@ export default function GaugeChart({
                 startAngle={180}
                 endAngle={0}
                 innerRadius={60}
-                outerRadius={80}
+                outerRadius={90}
                 paddingAngle={2}
                 dataKey="value"
                 onMouseEnter={onPieEnter}
@@ -230,7 +251,7 @@ export default function GaugeChart({
               </Pie>
             </PieChart>
           </ResponsiveContainer>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/3 text-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={completionRate}
@@ -255,58 +276,53 @@ export default function GaugeChart({
             </AnimatePresence>
           </div>
         </div>
-        <div className="flex justify-between items-center px-4 mt-4">
+        <div className="grid grid-cols-3 gap-4">
           {Object.entries(stats).map(([key, value], index) => (
-            <TooltipProvider key={key}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="flex flex-col items-center"
+            <Card key={key} className="overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge
+                    variant="secondary"
+                    className={cn(
+                      "text-xs font-semibold",
+                      prayerStatusConfig[key as keyof typeof prayerStatusConfig]
+                        .color,
+                      prayerStatusConfig[key as keyof typeof prayerStatusConfig]
+                        .bgColor
+                    )}
                   >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={cn(
-                        "relative overflow-hidden transition-all duration-300",
-                        key === "prayed" &&
-                          "bg-gradient-to-r from-green-400 to-green-600 text-white",
-                        key === "late" &&
-                          "bg-gradient-to-r from-yellow-400 to-yellow-600 text-white",
-                        key === "notPrayed" &&
-                          "bg-gradient-to-r from-red-400 to-red-600 text-white",
-                        "font-semibold py-1 px-3"
-                      )}
-                    >
-                      <motion.div
-                        className="absolute inset-0 bg-white opacity-20"
-                        initial={{ x: "-100%" }}
-                        animate={{ x: "100%" }}
-                        transition={{
-                          duration: 1,
-                          repeat: Infinity,
-                          repeatType: "loop",
-                        }}
-                      />
-                      <span className="relative z-10">{value}</span>
-                    </Button>
-                    <span className="text-sm text-gray-600 mt-1 capitalize">
-                      {key.replace(/([A-Z])/g, " $1").trim()}
-                    </span>
-                  </motion.div>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="bottom"
-                  className="bg-gray-800 text-white p-2 rounded-md shadow-lg"
-                >
-                  <p>{`${
-                    key.charAt(0).toUpperCase() + key.slice(1)
-                  } prayers: ${value}`}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                    {
+                      prayerStatusConfig[key as keyof typeof prayerStatusConfig]
+                        .label
+                    }
+                  </Badge>
+                  {
+                    prayerStatusConfig[key as keyof typeof prayerStatusConfig]
+                      .icon
+                  }
+                </div>
+                <div className="text-3xl font-bold mb-2">{value}</div>
+                <Progress
+                  value={
+                    calculateRates(stats)[
+                      `${key}Rate` as keyof ReturnType<typeof calculateRates>
+                    ]
+                  }
+                  className={cn(
+                    "h-2 mb-2",
+                    key === "prayed" && "[&>div]:bg-green-500",
+                    key === "late" && "[&>div]:bg-yellow-500",
+                    key === "notPrayed" && "[&>div]:bg-red-500"
+                  )}
+                />
+                <div className="text-sm text-gray-500">
+                  {calculateRates(stats)[
+                    `${key}Rate` as keyof ReturnType<typeof calculateRates>
+                  ].toFixed(1)}
+                  % of total
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </CardContent>
