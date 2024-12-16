@@ -219,7 +219,7 @@ export default function GaugeChart({
   };
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn("w-full shadow-none", className)}>
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
           {title}

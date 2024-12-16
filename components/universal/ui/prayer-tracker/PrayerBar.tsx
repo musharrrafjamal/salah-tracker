@@ -59,7 +59,7 @@ export function PrayerBar({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className={`flex items-center justify-between p-4 rounded-xl bg-white dark:bg-gray-800/50 shadow-sm border border-gray-100 dark:border-gray-700/50 ${className}`}
+      className={`flex items-center justify-between p-4 rounded-xl bg-white hover:bg-neutral-50 transition-colors duration-300 dark:bg-neutral-800/50 dark:border-neutral-700/50 ${className}`}
     >
       <div className="flex items-center gap-3">
         <div

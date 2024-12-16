@@ -98,7 +98,7 @@ const TrackAdvancement = () => {
                 mode="single"
                 selected={date}
                 onSelect={setDate}
-                className="rounded-xl px-5 py-4 border bg-white dark:bg-gray-800"
+                className="rounded-xl px-5 py-4 border bg-white dark:bg-neutral-800/50"
               />
             </div>
             <div className="flex flex-grow gap-8">
@@ -106,9 +106,9 @@ const TrackAdvancement = () => {
                 streak={7}
                 title="Current Streak"
                 accentColor="text-orange-500"
-                elementsBgColor="bg-orange-500/10"
+                elementsBgColor="bg-orange-500/10 dark:bg-orange-500/30"
                 svg={<CurrentStreakSvg />}
-                backgroundColor="bg-white dark:bg-gray-800"
+                backgroundColor="bg-white dark:bg-neutral-800/20"
                 textColor="text-gray-800 dark:text-gray-100"
                 className="flex-grow"
               />
@@ -116,9 +116,9 @@ const TrackAdvancement = () => {
                 streak={14}
                 title="Longest Streak"
                 accentColor="text-blue-500"
-                elementsBgColor="bg-blue-500/10"
+                elementsBgColor="bg-blue-500/10 dark:bg-blue-500/30"
                 svg={<LongestStreakSvg />}
-                backgroundColor="bg-white dark:bg-gray-800"
+                backgroundColor="bg-white dark:bg-neutral-800/20"
                 textColor="text-gray-800 dark:text-gray-100"
                 className="flex-grow"
               />

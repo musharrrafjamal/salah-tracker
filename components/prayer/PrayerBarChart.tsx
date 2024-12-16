@@ -142,7 +142,9 @@ export function PrayerBarChart() {
   };
 
   return (
-    <Card className={cn("w-full max-w-3xl", isDarkMode ? "dark" : "")}>
+    <Card
+      className={cn("w-full max-w-3xl shadow-none", isDarkMode ? "dark" : "")}
+    >
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-2xl font-bold">

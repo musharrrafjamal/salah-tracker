@@ -21,14 +21,14 @@ export function StreakCard({
   svg,
   accentColor = "text-orange-500",
   elementsBgColor,
-  backgroundColor = "bg-white dark:bg-gray-800",
-  textColor = "text-gray-800 dark:text-gray-100",
+  backgroundColor = "bg-white dark:bg-neutral-800/50",
+  textColor = "text-neutral-800 dark:text-neutral-100",
 }: StreakCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`relative overflow-hidden rounded-2xl border dark:border-gray-700/50 ${backgroundColor} ${className}`}
+      className={`relative overflow-hidden rounded-2xl border dark:border-neutral-700/50 ${backgroundColor} ${className}`}
     >
       {/* Decorative Elements */}
       <div

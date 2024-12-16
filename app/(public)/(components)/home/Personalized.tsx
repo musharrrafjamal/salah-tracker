@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { PrayerTracker } from "@/components/universal/ui/prayer-tracker/PrayerTracker";
+import { EnhancedPrayerTracker } from "@/components/universal/ui/prayer-tracker/EnhancedPrayerTracker";
 
 const Personalized = () => {
   const controls = useAnimation();
@@ -68,7 +69,7 @@ const Personalized = () => {
         </motion.p>
       </div>
       <motion.div variants={itemVariants} className="mt-10">
-        <PrayerTracker />
+        <EnhancedPrayerTracker />
       </motion.div>
     </motion.div>
   );
