@@ -29,9 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        suppressHydrationWarning
         className={`${poppins.variable} ${urbanist.variable} antialiased dark:bg-neutral-950`}
       >
         <ReduxProvider>

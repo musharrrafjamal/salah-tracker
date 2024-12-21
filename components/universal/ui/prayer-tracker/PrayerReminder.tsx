@@ -17,7 +17,7 @@ export function PrayerReminder({ onClose }: PrayerReminderProps) {
       className="fixed bottom-6 left-6 right-6 bg-primary text-primary-foreground p-4 rounded-lg shadow-lg"
     >
       <div className="flex justify-between items-center">
-        <p className="text-lg font-semibold">It's time for prayer!</p>
+        <p className="text-lg font-semibold">It&apos;s time for prayer!</p>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>

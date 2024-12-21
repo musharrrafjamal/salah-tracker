@@ -32,6 +32,10 @@ import {
 } from "@/components/shadcn/ui/dialog";
 import { calculatePrayerTimes, adjustPrayerTime } from "@/lib/prayerUtils";
 import { formatTimeToString, getTimeLeftString } from "@/lib/timeUtils";
+import { PrayerCard } from "./PrayerCard";
+import { PrayerLegend } from "./PrayerLegend";
+
+type PrayerName = "Fajr" | "Dhuhr" | "Asr" | "Maghrib" | "Isha";
 
 const prayerIcons: Record<string, React.ElementType> = {
   Fajr: Sunrise,
@@ -41,14 +45,114 @@ const prayerIcons: Record<string, React.ElementType> = {
   Isha: Moon,
 };
 
+interface Prayer {
+  id: string;
+  name: PrayerName;
+  icon: React.ReactNode;
+  iconColor: string;
+  status: "prayed" | "late" | "not-prayed";
+  time: Date;
+  adjustment: number;
+}
+
 export function DynamicPrayerTimes() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [prayerTimes, setPrayerTimes] = useState<Record<string, Date>>({});
-  const [nextPrayer, setNextPrayer] = useState("");
-  const [timeLeft, setTimeLeft] = useState("");
-  const [adjustments, setAdjustments] = useState<Record<string, number>>({});
   const [use24HourFormat, setUse24HourFormat] = useState(false);
-  const { theme } = useTheme();
+
+  const initialTimes = calculatePrayerTimes(new Date(), {});
+  const [prayers, setPrayers] = useState<Prayer[]>([
+    {
+      id: "fajr",
+      name: "Fajr",
+      icon: <Sunrise className="w-5 h-5 text-emerald-500" />,
+      iconColor: "bg-emerald-50",
+      status: "not-prayed",
+      time: initialTimes.Fajr,
+      adjustment: 0,
+    },
+    {
+      id: "dhuhr",
+      name: "Dhuhr",
+      icon: <CloudSun className="w-5 h-5 text-sky-500" />,
+      iconColor: "bg-sky-50",
+      status: "not-prayed",
+      time: initialTimes.Dhuhr,
+      adjustment: 0,
+    },
+    {
+      id: "asr",
+      name: "Asr",
+      icon: <Sun className="w-5 h-5 text-pink-500" />,
+      iconColor: "bg-pink-50",
+      status: "not-prayed",
+      time: initialTimes.Asr,
+      adjustment: 0,
+    },
+    {
+      id: "maghrib",
+      name: "Maghrib",
+      icon: <Sunset className="w-5 h-5 text-orange-500" />,
+      iconColor: "bg-orange-50",
+      status: "not-prayed",
+      time: initialTimes.Maghrib,
+      adjustment: 0,
+    },
+    {
+      id: "isha",
+      name: "Isha",
+      icon: <Moon className="w-5 h-5 text-indigo-500" />,
+      iconColor: "bg-indigo-50",
+      status: "not-prayed",
+      time: initialTimes.Isha,
+      adjustment: 0,
+    },
+  ]);
+
+  const calculateNextPrayer = () => {
+    const now = new Date();
+    return prayers.find((prayer) => prayer.time > now) || prayers[0];
+  };
+
+  const adjustmentsString = prayers.map((p) => p.adjustment).join(",");
+
+  useEffect(() => {
+    const adjustments = Object.fromEntries(
+      prayers.map((prayer) => [prayer.name, prayer.adjustment])
+    );
+    const newTimes = calculatePrayerTimes(currentTime, adjustments);
+
+    const hasTimeChanges = prayers.some(
+      (prayer) => prayer.time.getTime() !== newTimes[prayer.name].getTime()
+    );
+
+    if (hasTimeChanges) {
+      setPrayers((prev) =>
+        prev.map((prayer) => ({
+          ...prayer,
+          time: newTimes[prayer.name],
+        }))
+      );
+    }
+  }, [currentTime, prayers]);
+
+  const handleAdjustment = (prayerId: string, value: number[]) => {
+    setPrayers((prev) =>
+      prev.map((prayer) =>
+        prayer.id === prayerId ? { ...prayer, adjustment: value[0] } : prayer
+      )
+    );
+  };
+
+  const handleStatusChange = (
+    prayerId: string,
+    newStatus: "prayed" | "late" | "not-prayed"
+  ) => {
+    setPrayers((prev) =>
+      prev.map((prayer) =>
+        prayer.id === prayerId ? { ...prayer, status: newStatus } : prayer
+      )
+    );
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -58,35 +162,58 @@ export function DynamicPrayerTimes() {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    const times = calculatePrayerTimes(currentTime, adjustments);
-    setPrayerTimes(times);
-
-    const sortedPrayers = Object.entries(times).sort(
-      (a, b) => a[1].getTime() - b[1].getTime()
-    );
-    const next =
-      sortedPrayers.find(([_, time]) => time > currentTime) || sortedPrayers[0];
-    setNextPrayer(next[0]);
-
-    const timeDiff = next[1].getTime() - currentTime.getTime();
-    setTimeLeft(getTimeLeftString(timeDiff));
-  }, [currentTime, adjustments]);
-
-  const Icon = prayerIcons[nextPrayer as keyof typeof prayerIcons];
-
-  const handleAdjustment = (prayer: string, value: number[]) => {
-    setAdjustments((prev) => ({ ...prev, [prayer]: value[0] }));
-  };
+  const Icon =
+    prayerIcons[calculateNextPrayer().name as keyof typeof prayerIcons];
 
   return (
-    <Card className="w-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900 dark:to-purple-900">
-      <CardContent className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-primary">Prayer Times</h2>
+    <Card className="w-full shadow-none border-none dark:from-blue-900 dark:to-purple-900">
+      <CardContent className="space-y-6 p-0">
+        <motion.div
+          className="bg-white dark:bg-gray-800 rounded-xl p-6 border flex justify-between"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Next Prayer</h3>
+            <div className="flex items-center space-x-2">
+              {Icon && (
+                <div
+                  className={`p-2 rounded-lg flex items-center justify-center ${
+                    calculateNextPrayer().iconColor
+                  }`}
+                >
+                  <Icon
+                    size={48}
+                    className={`w-12 h-12 ${
+                      calculateNextPrayer().name === "Fajr"
+                        ? "text-emerald-500"
+                        : calculateNextPrayer().name === "Dhuhr"
+                        ? "text-sky-500"
+                        : calculateNextPrayer().name === "Asr"
+                        ? "text-pink-500"
+                        : calculateNextPrayer().name === "Maghrib"
+                        ? "text-orange-500"
+                        : "text-indigo-500"
+                    }`}
+                  />
+                </div>
+              )}
+              <div>
+                <p className="text-3xl font-bold text-primary">
+                  {calculateNextPrayer().name}
+                </p>
+                <p className="text-lg text-muted-foreground">
+                  {getTimeLeftString(
+                    calculateNextPrayer().time.getTime() - currentTime.getTime()
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
           <ResponsiveModal>
             <ResponsiveModalTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="secondary" size="icon">
                 <Settings className="h-4 w-4" />
               </Button>
             </ResponsiveModalTrigger>
@@ -95,19 +222,19 @@ export function DynamicPrayerTimes() {
                 <ResponsiveModalTitle>Adjust Prayer Times</ResponsiveModalTitle>
               </ResponsiveModalHeader>
               <div className="space-y-4">
-                {Object.keys(prayerTimes).map((prayer) => (
-                  <div key={prayer} className="space-y-2">
-                    <label className="text-sm font-medium">{prayer}</label>
+                {prayers.map((prayer, index) => (
+                  <div key={prayer.id} className="space-y-2">
+                    <label className="text-sm font-medium">{prayer.name}</label>
                     <Slider
                       min={-30}
                       max={30}
                       step={1}
-                      value={[adjustments[prayer] || 0]}
-                      onValueChange={(value) => handleAdjustment(prayer, value)}
+                      value={[prayer.adjustment]}
+                      onValueChange={(value) =>
+                        handleAdjustment(prayer.id, value)
+                      }
                     />
-                    <span className="text-sm">
-                      {adjustments[prayer] || 0} minutes
-                    </span>
+                    <span className="text-sm">{prayer.adjustment} minutes</span>
                   </div>
                 ))}
                 <div className="flex items-center space-x-2">
@@ -121,82 +248,44 @@ export function DynamicPrayerTimes() {
               </div>
             </ResponsiveModalContent>
           </ResponsiveModal>
+        </motion.div>
+        
+        <PrayerLegend />
+
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {prayers.map((prayer, index) => (
+            <PrayerCard
+              key={prayer.id}
+              prayer={prayer}
+              formatTimeToString={formatTimeToString}
+              use24HourFormat={use24HourFormat}
+              onStatusChange={handleStatusChange}
+            />
+          ))}
         </div>
 
-        <div className="space-y-6">
-          <motion.div
-            className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h3 className="text-xl font-semibold mb-2">Next Prayer</h3>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-3xl font-bold text-primary">{nextPrayer}</p>
-                <p className="text-lg text-muted-foreground">{timeLeft}</p>
-              </div>
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                {Icon && <Icon size={48} className="text-primary" />}
-              </motion.div>
-            </div>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.entries(prayerTimes).map(([prayer, time], index) => (
-              <motion.div
-                key={prayer}
-                className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md flex justify-between items-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                <div className="flex items-center space-x-3">
-                  {prayer in prayerIcons && (
-                    <Icon
-                      component={
-                        prayerIcons[prayer as keyof typeof prayerIcons]
-                      }
-                      className="h-6 w-6 text-primary"
-                    />
-                  )}
-                  <span className="font-medium">{prayer}</span>
-                </div>
-                <span>{formatTimeToString(time, use24HourFormat)}</span>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            <p className="text-2xl font-semibold">
-              {currentTime.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: !use24HourFormat,
-              })}
-            </p>
-            <p className="text-muted-foreground">
-              {currentTime.toLocaleDateString([], {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          </motion.div>
-        </div>
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <p className="text-2xl font-semibold">
+            {currentTime.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: !use24HourFormat,
+            })}
+          </p>
+          <p className="text-muted-foreground">
+            {currentTime.toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        </motion.div>
       </CardContent>
     </Card>
   );
