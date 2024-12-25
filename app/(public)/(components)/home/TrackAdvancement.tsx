@@ -3,13 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { Calendar } from "@/components/shadcn/ui/calendar";
-import { PrayerDayStatus } from "@/components/prayer/PrayerDayStatus";
-import { StreakCard } from "@/components/prayer/StreakCard";
 import { PrayerBarChart } from "@/components/prayer/PrayerBarChart";
 import GaugeChart from "@/components/prayer/gauge-chart/GaugeChart";
-import CurrentStreakSvg from "../assets/CurrentStreakSvg";
-import LongestStreakSvg from "../assets/LongestStreakSvg";
 
 const TrackAdvancement = () => {
   const controls = useAnimation();
@@ -46,14 +41,6 @@ const TrackAdvancement = () => {
       },
     },
   };
-
-  const [date, setDate] = useState<Date | undefined>(new Date());
-
-  const progressData = [
-    { value: 60, status: "prayed" as const },
-    { value: 20, status: "not-prayed" as const },
-    { value: 20, status: "late" as const },
-  ];
 
   const stats = {
     prayed: 2,
@@ -92,41 +79,7 @@ const TrackAdvancement = () => {
       </div>
       <motion.div variants={itemVariants} className="mt-10">
         <div className="container mx-auto p-4 space-y-8">
-          <div className="flex items-stretch w-full gap-8">
-            <div className="flex-shrink-0">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-xl px-5 py-4 border bg-white dark:bg-neutral-800/50"
-              />
-            </div>
-            <div className="flex flex-grow gap-8">
-              <StreakCard
-                streak={7}
-                title="Current Streak"
-                accentColor="text-orange-500"
-                elementsBgColor="bg-orange-500/10 dark:bg-orange-500/30"
-                svg={<CurrentStreakSvg />}
-                backgroundColor="bg-white dark:bg-neutral-800/20"
-                textColor="text-gray-800 dark:text-gray-100"
-                className="flex-grow"
-              />
-              <StreakCard
-                streak={14}
-                title="Longest Streak"
-                accentColor="text-blue-500"
-                elementsBgColor="bg-blue-500/10 dark:bg-blue-500/30"
-                svg={<LongestStreakSvg />}
-                backgroundColor="bg-white dark:bg-neutral-800/20"
-                textColor="text-gray-800 dark:text-gray-100"
-                className="flex-grow"
-              />
-            </div>
-          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {/* <PrayerDayStatus /> */}
-
             <PrayerBarChart />
 
             <GaugeChart

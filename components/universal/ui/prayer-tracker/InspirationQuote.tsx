@@ -22,7 +22,7 @@ export function InspirationQuote() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-r from-green-400 to-teal-500 text-white rounded-2xl p-6 shadow-lg"
+      className="bg-gradient-to-r from-green-400 to-teal-500 text-white rounded-2xl p-6 shadow-lg w-full max-h-full"
     >
       <h2 className="text-2xl font-bold mb-4">Inspiration</h2>
       <p className="text-lg italic">&ldquo;{quote}&rdquo;</p>
