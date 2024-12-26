@@ -65,6 +65,7 @@ export function NoteInput({ onAddNote }: NoteInputProps) {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
+                maxLength={100}
                 placeholder="Write a note..."
                 icon={<BookOpenCheck className="w-4 h-4" />}
                 onKeyPress={(e) => {
